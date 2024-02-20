@@ -84,6 +84,11 @@ $marks = [
         'physics' => 49,
         'maths' => 40,
         'chem' => 90,
+    ],
+    'zawzaw' => [
+        'physics' => 80,
+        'maths' => 30,
+        'chem' => 50,
     ]
 ];
 

@@ -141,7 +141,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <?php if ($formSubmitted) { ?>
                 <div class="alert alert-success" role="alert">
-                    Form submitted successfully!
+                    You are logged in!!!
                 </div>
             <?php } ?>
         </div>

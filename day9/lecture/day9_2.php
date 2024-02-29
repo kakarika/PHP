@@ -19,31 +19,40 @@ if ($conn->query($sql) === TRUE) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (empty($_POST["title"])) {
-        $titleErr = "title is required";
-    } else {
-        $title = $_POST["title"];
-        $title = filter_var($title, FILTER_SANITIZE_STRING);
-    }
-
-    if (empty($_POST["body"])) {
-        $bodyErr = "body is required";
-    } else {
-        $body = $_POST["body"];
-        $body = filter_var($body, FILTER_SANITIZE_STRING);
-    }
-
-    $body = str_replace(array("\r", "\n"), '', $body);
-
-    if (empty($titleErr) && empty($bodyErr)) {
-        $query = $conn->prepare("INSERT INTO notes (title, body) VALUES (?,?)");
-        $query->bind_param("ss", $title, $body);
-
-        $query->execute();
-        $query->close();
+    if (isset($_POST['action']) == 'DELETE') {
+        $id = $_POST['id'];
+        $delete = "DELETE FROM notes WHERE id = $id;";
+        $conn->query($delete);
 
         header("Location: {$_SERVER['PHP_SELF']}");
         exit();
+    } else {
+        if (empty($_POST["title"])) {
+            $titleErr = "title is required";
+        } else {
+            $title = $_POST["title"];
+            $title = filter_var($title, FILTER_SANITIZE_STRING);
+        }
+
+        if (empty($_POST["body"])) {
+            $bodyErr = "body is required";
+        } else {
+            $body = $_POST["body"];
+            $body = filter_var($body, FILTER_SANITIZE_STRING);
+        }
+
+        $body = str_replace(array("\r", "\n"), '', $body);
+
+        if (empty($titleErr) && empty($bodyErr)) {
+            $query = $conn->prepare("INSERT INTO notes (title, body) VALUES (?,?)");
+            $query->bind_param("ss", $title, $body);
+
+            $query->execute();
+            $query->close();
+
+            header("Location: {$_SERVER['PHP_SELF']}");
+            exit();
+        }
     }
 }
 
@@ -95,6 +104,7 @@ $result = $conn->query($sql);
                     <th>ID</th>
                     <th>Title</th>
                     <th>Body</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
@@ -103,13 +113,20 @@ $result = $conn->query($sql);
                         <td><?php echo $row["id"] ?></td>
                         <td><?php echo $row["title"] ?></td>
                         <td><?php echo $row["body"] ?></td>
+                        <td>
+                            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="POST">
+                                <input type="hidden" name="id" value=<?= $row['id'] ?>>
+                                <input type="hidden" name="action" value="DELETE">
+                                <button class="btn btn-danger">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 <?php } ?>
             </tbody>
         </table>
 
     <?php } else {
-        echo "No notes";
+        echo "<h2 class='text-center mt-5 text-danger'>There is no notes</h2>";
     }
     $conn->close(); ?>
 </body>
